@@ -1,3 +1,4 @@
+import { generateToken } from "../lib/utlis.js"
 import User from "../models/user.model.js"
 import bcrypt from 'bcryptjs'
 
@@ -31,8 +32,34 @@ export const signup=  async (req,res)=>{
         const salt=await bcrypt.genSalt(10)
         const hashedPassword=await bcrypt.hash(password,salt)
 
+        const newUser=new User (
+            {
+                fullname,
+                email,
+                password:hashedPassword,
+            })
+            if(newUser){
+                generateToken(newUser._id,res)
+                await newUser.save();
+
+                res.status(200).json({
+                    success:true,
+                    message:"newUser created succesfylly!!",
+                    newUser
+                })
+
+            }else{
+                 res.status(400).json({
+                    success:false,
+                    message:"Invalid user data"});
+            }
     }
     catch(e){
+        console.log("error",e.message)
+        return res.status(400).json({
+            success:false,
+            message:e.message
+        })
 
     }
 }
