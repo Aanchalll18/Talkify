@@ -64,8 +64,49 @@ export const signup=  async (req,res)=>{
     }
 }
 
-export const login=(req,res)=>{
-    res.send("login router")
+export const login= async (req,res)=>{
+    try{
+        const {email,password}=req.body;
+    if(!email || !password){
+        return res.status(400).json({
+            "success":false,
+            message:"All fields are mandatory"
+        })
+    }
+    const user=await User.findOne({email})
+    if(!user){
+        return res.status(400).json({
+            success:false,
+            message:"user doesn't exits"
+        })
+    }
+   const isPassword= await bcrypt.compare(password,user.password)
+   if(!isPassword){
+    return res.status(400).json({
+        success:false,
+        message:"Invalid password"
+    })
+   }
+   generateToken(user._id,res)
+
+   res.status(200).json({
+    _id:user._id,
+    fullname:user.fullname,
+    email:user.email,
+    profilepic:user.profilepic
+   })
+
+
+
+    }
+    catch(e){
+        console.log(e);
+        return res.status(200).json({
+            success:false,
+            message:"can't login",
+            e:e.message
+        })
+    }
 }
 
 export const logout=(req,res)=>{
