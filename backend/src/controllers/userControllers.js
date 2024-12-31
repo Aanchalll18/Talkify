@@ -110,5 +110,33 @@ export const login= async (req,res)=>{
 }
 
 export const logout=(req,res)=>{
-    res.send("logout router")
+    try{
+        res.cookie("jwt","",{maxAge:0})
+        res.status(200).json({
+            success:true,
+            message:"logged out successfully"
+        })
+
+    }
+    catch(e){
+        console.log(e)
+        return res.status(400).json({
+            success:fasle,
+            message:"error occured",
+            e:e.message
+        })
+    }
+}
+export const profilePicture =async (req,res)=>{
+    try{
+
+    }
+    catch(e){
+        console.log(e)
+        return res.status(400).json({
+            success:false,
+            message:"Failed to upload Profile Picture",
+            error:e.message
+        })
+    }
 }
