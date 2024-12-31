@@ -1,6 +1,7 @@
 import { generateToken } from "../lib/utlis.js"
 import User from "../models/user.model.js"
 import bcrypt from 'bcryptjs'
+import cloudinary from '../lib/cloudinary.js'
 
 
 export const signup=  async (req,res)=>{
@@ -129,6 +130,25 @@ export const logout=(req,res)=>{
 }
 export const profilePicture =async (req,res)=>{
     try{
+        const {profilepic}=req.body
+        const userId=req.user._id;
+        if(!profilepic){
+            return res.status(400).json({
+                success:false,
+                message:"please upload the picture"
+            })
+        }
+        const uploadPicture=await cloudinary.uploader.upload(profilepic)
+
+        const updatedUser=await User.findByIdAndUpdate(
+            userId,
+            {profilepic:uploadPicture.secure_url},{new:true}
+        );
+        res.staus(200).json({
+            success:true,
+            meassgae:"image uplloaded successfully",
+            updatedUser
+        })
 
     }
     catch(e){
